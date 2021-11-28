@@ -24,7 +24,8 @@ class CreateChampionsTable extends Migration
             $table->unsignedTinyInteger('ga');
             $table->tinyInteger('gd');
             $table->unsignedTinyInteger('points');
-            $table->unsignedTinyInteger('position')->default(1);
+            $table->unsignedTinyInteger('prev_pos')->default(0);
+            $table->unsignedTinyInteger('pos')->default(0);
         });
 
         Schema::table('champions', function (Blueprint $table) {

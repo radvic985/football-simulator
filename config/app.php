@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         App\Providers\GenerateMatchesServiceProvider::class,
+        App\Providers\CalculateLeagueTableServiceProvider::class,
     ],
 
     /*

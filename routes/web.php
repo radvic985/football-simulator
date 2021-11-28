@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\ChampionshipController;
+use App\Http\Controllers\GenerateMatchesController;
+use App\Http\Controllers\MatchResultController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +17,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('start');
 });
+
+Route::get('/championship', ChampionshipController::class);
+Route::get('/match-results/{week?}', MatchResultController::class);
+//Route::get('/generate', GenerateMatchesController::class);
+Route::get('/generate', GenerateMatchesController::class)->middleware('generate');
+//Route::get('/generate/{amount?}', GenerateMatchesController::class);
