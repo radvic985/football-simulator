@@ -19,7 +19,7 @@ class GenerateMatchesController extends Controller
     public function __invoke(int $teamCount = 20)
     {
         try {
-            $matchesGrid = $this->generateMatches->getMatchesGrid();
+            $matchesGrid = $this->generateMatches->getMatchesGrid($teamCount);
             MatchResult::saveMatches($this->generateMatches->getPlayedMatches($matchesGrid));
         } catch (Exception $exception) {
             Log::error('GenerateMatchesError: ' . $exception->getMessage());

@@ -65,23 +65,16 @@ class MatchResult extends Model
 
     public static function getMatchResults(?int $week)
     {
-//        Log::info('week = ' . $week);
-//        Log::info('=================');
-
-//        dd(!is_null($week));
         return self::with(['homeTeam', 'guestTeam'])
             ->when($week, function (Builder $query, $week) {
-//                dd($week);
                 return $query->where('week', $week);
             })
-//            ->where('week', $week)
             ->orderBy('week')
             ->get();
-//        return self::with(['homeTeam', 'guestTeam'])
-//            ->when(!is_null($week), function (Builder $query, $week) {
-//                return $query->where('week', $week);
-//            })
-//            ->orderBy('week')
-//            ->get();
+    }
+
+    public static function saveMatches(array $matches)
+    {
+        self::query()->insert($matches);
     }
 }
