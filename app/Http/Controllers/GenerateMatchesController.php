@@ -3,27 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\GenerateMatchesInterface;
+use App\Http\Requests\GenerateRequest;
 use App\Models\MatchResult;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class GenerateMatchesController extends Controller
 {
-    public GenerateMatchesInterface $generateMatches;
-
-    public function __construct(GenerateMatchesInterface $generateMatches)
-    {
-        $this->generateMatches = $generateMatches;
-    }
-
-    public function __invoke(int $teamCount = 20)
+    public function __invoke(GenerateRequest $request, GenerateMatchesInterface $generateMatches)
     {
         try {
-            $matchesGrid = $this->generateMatches->getMatchesGrid($teamCount);
-            MatchResult::saveMatches($this->generateMatches->getPlayedMatches($matchesGrid));
+            DB::beginTransaction();
+
+            $matchesGrid = $generateMatches->getMatchesGrid($request->team_count);
+            MatchResult::saveMatches($generateMatches->getPlayedMatches($matchesGrid));
+
+            DB::commit();
         } catch (Exception $exception) {
+            DB::rollBack();
             Log::error('GenerateMatchesError: ' . $exception->getMessage());
-            return response('Error: ' . $exception->getMessage(), $exception->getCode());
+
+            return response('Error: ' . $exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return response('ok');
