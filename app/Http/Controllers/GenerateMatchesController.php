@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Contracts\GenerateMatchesInterface;
 use App\Http\Requests\GenerateRequest;
+use App\Models\Champion;
 use App\Models\MatchResult;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,7 @@ class GenerateMatchesController extends Controller
 
             $matchesGrid = $generateMatches->getMatchesGrid($request->team_count);
             MatchResult::saveMatches($generateMatches->getPlayedMatches($matchesGrid));
+            Champion::truncateTable();
 
             DB::commit();
         } catch (Exception $exception) {

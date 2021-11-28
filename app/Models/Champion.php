@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -16,7 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $ga
  * @property int $gd
  * @property int $points
- * @property int $position
+ * @property int $prev_pos
+ * @property int $pos
  *
  * @see Champion::team()
  * @property Team|null $team
@@ -55,7 +57,8 @@ class Champion extends Model
         'ga',
         'gd',
         'points',
-        'position',
+        'prev_pos',
+        'pos',
     ];
 
     public function team(): BelongsTo
@@ -65,6 +68,26 @@ class Champion extends Model
 
     public static function getChampions()
     {
-        return self::with('team')->orderBy('position')->get();
+        return self::with('team')->orderBy('pos')->get();
+    }
+
+    public static function updateLeagueTable(array $teamId, array $data)
+    {
+        static::query()->updateOrCreate($teamId, $data);
+    }
+
+    public static function getSortedLeagueTable()
+    {
+        return static::query()
+            ->orderByDesc('points')
+            ->orderByDesc('gd')
+            ->get();
+    }
+
+    public static function truncateTable()
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table(static::TABLE)->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

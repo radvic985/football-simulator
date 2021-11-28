@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -65,7 +66,7 @@ class MatchResult extends Model
 
     public static function getMatchResults(?int $week)
     {
-        return self::with(['homeTeam', 'guestTeam'])
+        return static::with(['homeTeam', 'guestTeam'])
             ->when($week, function (Builder $query, $week) {
                 return $query->where('week', $week);
             })
@@ -73,8 +74,32 @@ class MatchResult extends Model
             ->get();
     }
 
+    public static function getMatchResultsToWeek(?int $week)
+    {
+        return static::query()
+            ->when($week, function (Builder $query, $week) {
+                return $query->where('week', '<=', $week);
+            }, function (Builder $query) {
+                return $query->orderBy('week');
+            })
+            ->get();
+    }
+
     public static function saveMatches(array $matches)
     {
-        self::query()->insert($matches);
+        static::truncateTable();
+        static::query()->insert($matches);
+    }
+
+    public static function getMaxWeek()
+    {
+       return static::query()->max('week');
+    }
+
+    private static function truncateTable()
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table(static::TABLE)->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

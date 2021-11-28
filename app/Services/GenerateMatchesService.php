@@ -28,7 +28,7 @@ abstract class GenerateMatchesService implements GenerateMatchesInterface
                 $homeGoals = random_int(0,Constants::MAX_GOALS_PER_MATCH);
                 $guestGoals = random_int(0,Constants::MAX_GOALS_PER_MATCH);
                 $matches[] = [
-                    'week' => $week,
+                    'week' => $week + 1,
                     'home_team_id' => array_shift($weeks[$week][$match]),
                     'guest_team_id' => array_shift($weeks[$week][$match]),
                     'home_goals' => $homeGoals,

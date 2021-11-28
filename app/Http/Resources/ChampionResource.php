@@ -15,7 +15,8 @@ class ChampionResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'position' => $this->resource->position,
+            'pos' => $this->resource->pos,
+            'prev_pos' => $this->resource->prev_pos,
             'name' => $this->resource->team->name,
             'points' => $this->resource->points,
             'played' => $this->resource->played,
