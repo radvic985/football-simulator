@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChampionshipController;
 use App\Http\Controllers\GenerateMatchesController;
 use App\Http\Controllers\MatchResultController;
+use App\Http\Controllers\PredictionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +22,6 @@ Route::get('/', function () {
 });
 
 Route::get('/championship', ChampionshipController::class);
+Route::get('/prediction', PredictionController::class);
 Route::get('/match-results/{week?}', MatchResultController::class);
-//Route::get('/generate', GenerateMatchesController::class);
 Route::get('/generate', GenerateMatchesController::class)->middleware('generate');
-//Route::get('/generate/{amount?}', GenerateMatchesController::class);

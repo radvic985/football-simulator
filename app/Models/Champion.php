@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\DB;
  * @property int $prev_pos
  * @property int $pos
  *
+ * @property int|float $percent only read without saving to db
+ *
  * @see Champion::team()
  * @property Team|null $team
  */
@@ -68,7 +70,7 @@ class Champion extends Model
 
     public static function getChampions()
     {
-        return self::with('team')->orderBy('pos')->get();
+        return static::with('team')->orderBy('pos')->get();
     }
 
     public static function updateLeagueTable(array $teamId, array $data)
