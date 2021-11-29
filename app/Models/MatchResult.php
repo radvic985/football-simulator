@@ -85,6 +85,14 @@ class MatchResult extends Model
             ->get();
     }
 
+    public static function updateMatchResult(array $where, array $data): int
+    {
+        return static::query()
+            ->where('week', $where['week'])
+            ->where('home_team_id', Team::getTeamIdByName($where['home_name']))
+            ->update($data);
+    }
+
     public static function saveMatches(array $matches)
     {
         static::truncateTable();

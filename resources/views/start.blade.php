@@ -150,6 +150,37 @@
         let matchNumber = 1;
         let isExtraRow = false;
         let predictionWeekAppearance;
+        const createdCell = function(cell) {
+            let original;
+
+            cell.setAttribute('contenteditable', true);
+            cell.setAttribute('spellcheck', false);
+
+            cell.addEventListener('focus', function(e) {
+                original = e.target.textContent;
+            })
+
+            cell.addEventListener('blur', function(e) {
+                if (original !== e.target.textContent) {
+                    const row = matchesTable.row(e.target.parentElement);
+                    let params = {
+                        home_name: row.data().home_name,
+                        week: row.data().week,
+                        home_goals: e.path[0]._DT_CellIndex.column === 1 ? e.target.textContent : row.data().home_goals,
+                        guest_goals: e.path[0]._DT_CellIndex.column === 3 ? e.target.textContent : row.data().guest_goals
+                    }
+                    $.get('/match-update', params, function (message, status) {
+                        if (message === 'ok' && status === 'success') {
+                            let week = row.data().week;
+                            if (playAll) {
+                                week = '';
+                            }
+                            matchesTable.ajax.url('/match-results/' + week).load();
+                        }
+                    });
+                }
+            })
+        }
         let predictionsTable = $('#predictions').DataTable({
             columnDefs: [
                 {targets: 0, className: 'dt-head-left, dt-body-left'},
@@ -189,7 +220,9 @@
         let matchesTable = $('#matches').DataTable({
             columnDefs: [
                 {targets: 0, className: 'dt-body-left'},
-                {targets: -1, className: 'dt-body-right'}
+                {targets: -1, className: 'dt-body-right'},
+                {targets: 1,createdCell: createdCell},
+                {targets: 3,createdCell: createdCell},
             ],
             ajax: {
                 url: '/match-results/',
@@ -262,34 +295,6 @@
             });
         });
 
-        // const createdCell = function(cell) {
-        //     let original
-        //
-        //     cell.setAttribute('contenteditable', true)
-        //     cell.setAttribute('spellcheck', false)
-        //
-        //     cell.addEventListener('focus', function(e) {
-        //         original = e.target.textContent
-        //     })
-        //
-        //     cell.addEventListener('blur', function(e) {
-        //         if (original !== e.target.textContent) {
-        //             const row = table.row(e.target.parentElement)
-        //             $.ajax({
-        //                 url: '/updateScript/',
-        //                 data: row.data()
-        //             })
-        //         }
-        //     })
-        // }
-        //
-        // table = $('#example').DataTable({
-        //     columnDefs: [{
-        //         targets: '_all',
-        //         createdCell: createdCell
-        //     }]
-        // })
-
         $('#next_week').click(function () {
             let weekNumber = $('.week_number');
             let weekNumberDigit = Number(weekNumber.html());
@@ -323,11 +328,6 @@
 
         $('#play_again').click(function () {
             window.location.reload();
-            // $('.week_number').html(0);
-            // let startAgain = $('.start_championship');
-            // startAgain.html(teamCount);
-            // startAgain.trigger('click');
-            // $('.play_again').addClass('d-none').removeClass('d-inline-block');
         });
     });
 

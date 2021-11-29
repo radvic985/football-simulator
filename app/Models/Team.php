@@ -34,4 +34,11 @@ class Team extends Model
     protected $fillable = [
         'name',
     ];
+
+    public static function getTeamIdByName(string $name): ?int
+    {
+        /** @var Team $team */
+        $team = static::query()->where('name', $name)->first();
+        return $team->id ?? null;
+    }
 }

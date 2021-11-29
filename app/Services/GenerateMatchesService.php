@@ -50,7 +50,7 @@ abstract class GenerateMatchesService implements GenerateMatchesInterface
      * @param int $second
      * @return int|void
      */
-    protected function getPoints(int $first, int $second)
+    public function getPoints(int $first, int $second): int
     {
         switch ($first <=> $second) {
             case 0:
