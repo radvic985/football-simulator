@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Premier League Simulator</title>
 
@@ -22,6 +24,11 @@
 
     <script type="text/javascript" charset="utf8"
             src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    <style>
+        span.minus,span.plus, #range {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="pr-4 bg-light">
 <div id="start" class="row mt-5 text-center">
@@ -46,7 +53,7 @@
         <div class="row mt-4">
             <div class="w-100">
                 <h3>Team's List</h3>
-                <table id="teams" class="table table-striped table-bordered table-hover w-100">
+                <table id="teams" class="table table-bordered w-100">
                     <thead class="thead-dark">
                     <tr>
                         <th>#</th>
@@ -70,16 +77,17 @@
 </div>
 
 <div class="championship d-none row">
-    <div class="col-md-4 offset-md-4">
+    <div class="col-md-4 offset-md-4 text-center">
+        <div class="play_again text-right d-none">
+            <button id="play_again" class="btn btn-success btn-lg">Play Championship Again</button>
+        </div>
         <div class="d-inline-block">
             <button id="play_all" class="btn btn-success btn-lg">Play All</button>
         </div>
         <div class="d-inline-block">
             <button id="next_week" class="btn btn-success btn-lg">Next Week</button>
         </div>
-        <div class="play_again text-right d-none">
-            <button id="play_again" class="btn btn-success btn-lg">Play Championship Again</button>
-        </div>
+
     </div>
 </div>
 
@@ -158,6 +166,7 @@
         let matchNumber = 1;
         let isExtraRow = false;
         let predictionWeekAppearance;
+
         const createdCell = function (cell) {
             let original;
 
@@ -189,6 +198,7 @@
                 }
             })
         }
+
         let predictionsTable = $('#predictions').DataTable({
             scrollY: 650,
             columnDefs: [
@@ -208,6 +218,7 @@
                 {data: 'percent'}
             ]
         });
+
         let teamsTable = $('#teams').DataTable({
             scrollY: 450,
             columnDefs: [
@@ -224,9 +235,16 @@
                         return '<img src="/img/' + team.team_id + '.png">' + ' ' + team.name;
                     }
                 },
-                {data: 'team_id'}
+                {
+                    data: function (team) {
+                        return '<span class="minus"><img src="/img/minus.jpg" width="25px" height="25px"></span>'
+                            + '<span class="strength px-4" data-team-id="' + team.team_id + '">1</span>'
+                            + '<span class="plus"><img src="/img/plus.jpg" width="25px" height="25px"></span>';
+                    }
+                },
             ]
         });
+
         let leagueTable = $('#league').DataTable({
             scrollY: 650,
             columnDefs: [
@@ -272,6 +290,7 @@
                 {data: 'gd'}
             ]
         });
+
         let matchesTable = $('#matches').DataTable({
             scrollY: 600,
             columnDefs: [
@@ -354,10 +373,38 @@
             teamsTable.ajax.url('/teams-list/' + $(this).val()).load();
         });
 
+        $(document).on('hover', 'span.minus,span.plus', function () {
+            $(this).css('cursor', 'pointer');
+        });
+        $(document).on('click', 'span.plus', function () {
+            let strengthElem = $(this).siblings('.strength');
+            let strength = Number(strengthElem.html());
+            if (strength < 3) {
+                strengthElem.html(strength + 1);
+            }
+        });
+        $(document).on('click', 'span.minus', function () {
+            let strengthElem = $(this).siblings('.strength');
+            let strength = Number(strengthElem.html());
+            if (strength > 1) {
+                strengthElem.html(strength - 1);
+            }
+        });
+
         $('#start_championship').click(function () {
             teamCount = $('#team_count').html();
             predictionWeekAppearance = 2 * teamCount - 4;
-            $.get('/generate?team_count=' + teamCount, function (data, status) {
+
+            let strengths = [];
+            $('#teams tr .strength').each(function () {
+                strengths[$(this).data('team-id')] = $(this).html();
+            });
+
+            let params = {
+                team_count: teamCount,
+                strengths: strengths
+            };
+            $.post('/generate', params, function (data, status) {
                 if (data === 'ok' && status === 'success') {
                     $('#start').hide();
                     $('.championship').removeClass('d-none');
@@ -393,7 +440,6 @@
             $('.first-week').removeClass('d-none');
             $('#all_matches').removeClass('d-none');
             $('.play_again').removeClass('d-none').addClass('d-inline-block');
-
 
             matchesTable.ajax.url('/match-results/').load();
         });

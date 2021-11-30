@@ -22,9 +22,9 @@ Route::get('/', function () {
     return view('start');
 });
 
-Route::get('/generate', GenerateMatchesController::class)->middleware('generate');
+Route::post('/generate', GenerateMatchesController::class)->middleware('generate');
 Route::get('/championship', ChampionshipController::class);
 Route::get('/prediction', PredictionController::class);
-Route::get('/teams-list/{team_count}', [TeamListController::class, 'getTeams']);
+Route::get('/teams-list/{team_count}', TeamListController::class);
 Route::get('/match-results/{week?}', [MatchResultController::class, 'getMatches']);
 Route::get('/match-update', [MatchResultController::class, 'updateMatch']);

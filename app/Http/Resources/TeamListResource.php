@@ -17,7 +17,6 @@ class TeamListResource extends JsonResource
         return [
             'team_id' => $this->resource->id,
             'name' => $this->resource->name,
-            'strength' => $this->resource->id,
         ];
     }
 }

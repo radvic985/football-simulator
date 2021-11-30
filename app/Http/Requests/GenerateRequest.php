@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @property int $team_count
+ * @property array $strengths
  */
 class GenerateRequest extends FormRequest
 {
@@ -19,6 +20,13 @@ class GenerateRequest extends FormRequest
     {
         return [
             'team_count' => 'required|int|in:' . collect(Constants::AVAILABLE_TEAM_COUNTS)->implode(','),
+            'strengths' => 'required|array',
         ];
+    }
+
+    public function prepareStrengths(): array
+    {
+        $strengths = $this->strengths;
+        return collect($strengths)->filter()->toArray();
     }
 }

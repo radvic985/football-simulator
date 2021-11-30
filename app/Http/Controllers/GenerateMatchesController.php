@@ -19,7 +19,7 @@ class GenerateMatchesController extends Controller
             DB::beginTransaction();
 
             $matchesGrid = $generateMatches->getMatchesGrid($request->team_count);
-            MatchResult::saveMatches($generateMatches->getPlayedMatches($matchesGrid));
+            MatchResult::saveMatches($generateMatches->getPlayedMatches($matchesGrid, $request->prepareStrengths()));
             Champion::truncateTable();
 
             DB::commit();
