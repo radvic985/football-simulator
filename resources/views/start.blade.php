@@ -24,38 +24,43 @@
             src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
 </head>
 <body class="pr-4 bg-light">
-
-{{--    <div class="col-md-4 offset-md-4">--}}
-{{--        <h1 class="display-5">Choose the quantity of teams</h1>--}}
-{{--        <h1 id="team_count" class="display-3 text-primary">4</h1>--}}
-{{--        <div class="row">--}}
-{{--            <div class="col-md-1 text-primary">--}}
-{{--                <h1>4</h1>--}}
-{{--            </div>--}}
-{{--            <div class="col-md-10">--}}
-{{--                <input id="range" type="range" class="form-control-range mt-3" name="range" min="4" max="20"--}}
-{{--                       value="4" step="2">--}}
-{{--            </div>--}}
-{{--            <div class="col-md-1 text-primary">--}}
-{{--                <h1>20</h1>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--        <button id="start_championship" class="btn btn-success btn-lg">Start the championship</button>--}}
-{{--    </div>--}}
 <div id="start" class="row mt-5 text-center">
     <div class="col-md-4 offset-md-4">
-        <h1 class="display-5">Start championship for 4 or 20 teams</h1>
-        {{--        <h1 id="team_count" class="display-3 text-primary">4</h1>--}}
+        <h1 class="display-5">Choose the quantity of teams</h1>
+        <h1 id="team_count" class="display-3 text-primary">4</h1>
         <div class="row">
-            <div class="col-md-6 text-primary">
-                <button class="start_championship btn btn-success btn-lg">4</button>
+            <div class="col-md-1 text-primary">
+                <h1>4</h1>
             </div>
-            <div class="col-md-6 text-primary">
-                <button class="start_championship btn btn-success btn-lg">20</button>
+            <div class="col-md-10">
+                <input id="range" type="range" class="form-control-range mt-3" name="range" min="4" max="20"
+                       value="4" step="2">
+            </div>
+            <div class="col-md-1 text-primary">
+                <h1>20</h1>
+            </div>
+        </div>
+
+        <button id="start_championship" class="btn btn-success btn-lg">Start the championship</button>
+
+        <div class="row">
+            <div class="col-md-4 offset-md-4">
+                <h3>Team's List</h3>
+                <table id="teams" class="table table-striped table-bordered table-hover w-100">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Team</th>
+                        <th>Strength</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+
 <div class="row my-3 text-center">
     <div class="col-md-6 offset-md-3">
         <div class="d-none text-success finished">
@@ -199,6 +204,24 @@
                 {data: 'percent'}
             ]
         });
+        let teamsTable = $('#teams').DataTable({
+            columnDefs: [
+                {targets: 1, className: 'dt-body-left'},
+            ],
+            ajax: {
+                url: '/team-list',
+                dataSrc: 'data'
+            },
+            columns: [
+                {data: 'team_id'},
+                {
+                    data: function (team) {
+                        return '<img src="/img/' + team.team_id + '.png">' + ' ' + team.name;
+                    }
+                },
+                {data: 'percent'}
+            ]
+        });
         let leagueTable = $('#league').DataTable({
             columnDefs: [
                 {targets: 1, className: 'dt-body-left'}
@@ -317,8 +340,12 @@
             ]
         });
 
-        $('.start_championship').click(function () {
-            teamCount = $(this).html();
+        $('#range').change(function () {
+            $('#team_count').html($(this).val());
+        });
+
+        $('#start_championship').click(function () {
+            teamCount = $('#team_count').html();
             predictionWeekAppearance = 2 * teamCount - 4;
             $.get('/generate?team_count=' + teamCount, function (data, status) {
                 if (data === 'ok' && status === 'success') {

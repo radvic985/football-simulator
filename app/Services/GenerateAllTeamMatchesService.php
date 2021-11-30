@@ -15,6 +15,6 @@ class GenerateAllTeamMatchesService extends GenerateMatchesService
     public function getMatchesGrid(int $teamCount): array
     {
         $this->teamCount = $teamCount;
-        return Constants::GRID_TEAMS_20;
+        return Constants::MAP_COUNT_TO_GRID[$teamCount];
     }
 }
