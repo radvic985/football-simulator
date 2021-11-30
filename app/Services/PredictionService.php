@@ -130,18 +130,34 @@ class PredictionService implements PredictionInterface
     {
         $percentMax = $percents->max();
         if ($percentMax === 100) {
-            $percents->transform(function ($item) {
-                return floor($item / 2);
-            });
-            $newPercentSum = $percents->sum();
-            $newPercentMax = $percents->max();
+            if ($percents->filter(fn($item) => $item === $percentMax)->count() > 1) {
+                $percents->transform(function ($item) {
+                    return floor($item / 2);
+                });
+                $percentMax = $percents->max();
+                $secondSum = $percents->filter(fn($item) => $item !== $percents->max())->sum();
+                $newPercentMax = floor((100 - $secondSum) / 2);
 
-            $finalPercents = $percents->map(function ($item) use ($newPercentMax, $newPercentSum) {
-                if ($item === $newPercentMax) {
-                    $item = 100 - $newPercentSum + $newPercentMax;
-                }
-                return $item;
-            });
+                $finalPercents = $percents->map(function ($item) use ($newPercentMax, $percentMax) {
+                    if ($item === $percentMax) {
+                        $item = $newPercentMax;
+                    }
+                    return $item;
+                });
+            } else {
+                $percents->transform(function ($item) {
+                    return floor($item / 2);
+                });
+                $newPercentSum = $percents->sum();
+                $newPercentMax = $percents->max();
+
+                $finalPercents = $percents->map(function ($item) use ($newPercentMax, $newPercentSum) {
+                    if ($item === $newPercentMax) {
+                        $item = 100 - $newPercentSum + $newPercentMax;
+                    }
+                    return $item;
+                });
+            }
         } else {
             $secondMax = $percents->filter(fn($item) => $item !== $percentMax)->max();
             $coefficient = abs(0.74 - ($secondMax / $percentMax - 0.74));

@@ -16,7 +16,7 @@ class ChampionResource extends JsonResource
     {
         return [
             'pos' => $this->resource->pos,
-            'prev_pos' => $this->resource->prev_pos,
+            'is_up' => $this->resource->prev_pos <=> $this->resource->pos,
             'name' => $this->resource->team->name,
             'points' => $this->resource->points,
             'played' => $this->resource->played,
@@ -26,6 +26,7 @@ class ChampionResource extends JsonResource
             'gf' => $this->resource->gf,
             'ga' => $this->resource->ga,
             'gd' => $this->resource->gd,
+            'team_id' => $this->resource->team_id,
         ];
     }
 }

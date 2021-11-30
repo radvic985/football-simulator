@@ -150,17 +150,17 @@
         let matchNumber = 1;
         let isExtraRow = false;
         let predictionWeekAppearance;
-        const createdCell = function(cell) {
+        const createdCell = function (cell) {
             let original;
 
             cell.setAttribute('contenteditable', true);
             cell.setAttribute('spellcheck', false);
 
-            cell.addEventListener('focus', function(e) {
+            cell.addEventListener('focus', function (e) {
                 original = e.target.textContent;
             })
 
-            cell.addEventListener('blur', function(e) {
+            cell.addEventListener('blur', function (e) {
                 if (original !== e.target.textContent) {
                     const row = matchesTable.row(e.target.parentElement);
                     let params = {
@@ -191,7 +191,11 @@
                 dataSrc: 'data'
             },
             columns: [
-                {data: 'name'},
+                {
+                    data: function (match) {
+                        return '<img src="/img/' + match.team_id + '.png">' + ' ' + match.name;
+                    }
+                },
                 {data: 'percent'}
             ]
         });
@@ -204,9 +208,31 @@
                 dataSrc: 'data'
             },
             columns: [
-                {data: 'pos'},
-                // {data: 'prev_pos'},
-                {data: 'name'},
+                {
+                    data: function (team) {
+                        let caret = 'W';
+                        switch (team.is_up) {
+                            case 0:
+                                caret = 'circle';
+                                break;
+                            case -1:
+                                caret = 'down';
+                                break;
+                            case 1:
+                                caret = 'up';
+                                break;
+                        }
+                        if (Number($('.week_number').html()) === 1) {
+                            return team.pos;
+                        }
+                        return team.pos + ' ' + '<img src="/img/' + caret + '.png" width="10px" height="10px">';
+                    }
+                },
+                {
+                    data: function (team) {
+                        return '<img src="/img/' + team.team_id + '.png">' + ' ' + team.name;
+                    }
+                },
                 {data: 'points'},
                 {data: 'played'},
                 {data: 'won'},
@@ -221,8 +247,8 @@
             columnDefs: [
                 {targets: 0, className: 'dt-body-left'},
                 {targets: -1, className: 'dt-body-right'},
-                {targets: 1,createdCell: createdCell},
-                {targets: 3,createdCell: createdCell},
+                {targets: 1, createdCell: createdCell},
+                {targets: 3, createdCell: createdCell},
             ],
             ajax: {
                 url: '/match-results/',
@@ -271,15 +297,23 @@
                 }
             },
             columns: [
-                {data: 'home_name'},
+                {
+                    data: function (match) {
+                        return '<img src="/img/' + match.home_team_id + '.png">' + ' ' + match.home_name;
+                    }
+                },
                 {data: 'home_goals'},
                 {
                     data: function () {
-                        return '-'
+                        return '-';
                     }
                 },
                 {data: 'guest_goals'},
-                {data: 'guest_name'}
+                {
+                    data: function (match) {
+                        return match.guest_name + ' ' + '<img src="/img/' + match.guest_team_id + '.png">';
+                    }
+                }
             ]
         });
 
@@ -322,6 +356,7 @@
             $('#matches thead').addClass('d-none');
             $('.first-week').removeClass('d-none');
             $('#all_matches').removeClass('d-none');
+            $('.play_again').removeClass('d-none').addClass('d-inline-block');
 
             matchesTable.ajax.url('/match-results/').load();
         });

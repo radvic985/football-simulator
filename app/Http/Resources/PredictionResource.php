@@ -15,6 +15,7 @@ class PredictionResource extends JsonResource
     public function toArray($request): array
     {
         return [
+            'team_id' => $this->resource->team->id,
             'name' => $this->resource->team->name,
             'percent' => $this->resource->percent . ' %',
         ];

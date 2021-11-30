@@ -15,21 +15,26 @@ class GenerateFourTeamMatchesService extends GenerateMatchesService
         $this->teamCount = $teamCount;
 
         $weeks = [];
-        $combinationsCollection = collect($this->getCombinations());
+        $combinationsCollection = collect($this->getCombinations())->shuffle();
         $weeksCount = $this->teamCount * 2 - 2;
 
         for ($week = 0; $week < $weeksCount; $week++) {
             list($home, $guest) = $combinationsCollection->shift();
-            $weeks[$week] = $combinationsCollection
-                ->map(function ($item) use ($home, $guest) {
-                    if (!in_array($home, $item) && !in_array($guest, $item)) {
-                        $result = [[$home, $guest], $item];
-                        unset($item);
-                        return $result;
-                    }
+            $data = $combinationsCollection
+                ->map(function ($item, $key) use ($home, $guest) {
+                    if (!in_array($home, $item) && !in_array($guest, $item))
+                        return [$key => $item];
                 })
                 ->filter()
                 ->first();
+
+            foreach ($data as $key => $value) {
+                $combinationsCollection->forget($key);
+                $weeks[$week] = [
+                    [$home, $guest],
+                    $value
+                ];
+            }
         }
 
         return $weeks;

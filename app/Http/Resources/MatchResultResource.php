@@ -20,6 +20,8 @@ class MatchResultResource extends JsonResource
             'home_goals' => $this->resource->home_goals,
             'guest_goals' => $this->resource->guest_goals,
             'week' => $this->resource->week,
+            'home_team_id' => $this->resource->home_team_id,
+            'guest_team_id' => $this->resource->guest_team_id,
         ];
     }
 }
