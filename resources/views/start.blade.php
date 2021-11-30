@@ -28,7 +28,7 @@
     <div class="col-md-4 offset-md-4">
         <h1 class="display-5">Choose the quantity of teams</h1>
         <h1 id="team_count" class="display-3 text-primary">4</h1>
-        <div class="row">
+        <div class="row mb-4">
             <div class="col-md-1 text-primary">
                 <h1>4</h1>
             </div>
@@ -43,8 +43,8 @@
 
         <button id="start_championship" class="btn btn-success btn-lg">Start the championship</button>
 
-        <div class="row">
-            <div class="col-md-4 offset-md-4">
+        <div class="row mt-4">
+            <div class="w-100">
                 <h3>Team's List</h3>
                 <table id="teams" class="table table-striped table-bordered table-hover w-100">
                     <thead class="thead-dark">
@@ -69,6 +69,20 @@
     </div>
 </div>
 
+<div class="championship d-none row">
+    <div class="col-md-4 offset-md-4">
+        <div class="d-inline-block">
+            <button id="play_all" class="btn btn-success btn-lg">Play All</button>
+        </div>
+        <div class="d-inline-block">
+            <button id="next_week" class="btn btn-success btn-lg">Next Week</button>
+        </div>
+        <div class="play_again text-right d-none">
+            <button id="play_again" class="btn btn-success btn-lg">Play Championship Again</button>
+        </div>
+    </div>
+</div>
+
 <div class="championship row mt-3 text-center d-none w-100 mx-1">
     <div class="col-md-6 d-inline-block">
         <h3>League Table</h3>
@@ -89,33 +103,9 @@
             </thead>
             <tbody></tbody>
         </table>
-        <div class="text-left mt-3 d-inline-block">
-            <button id="play_all" class="btn btn-success btn-lg">Play All</button>
-        </div>
-        <div class="text-right d-inline-block">
-            <button id="next_week" class="btn btn-success btn-lg">Next Week</button>
-        </div>
-        <div class="play_again text-right d-none">
-            <button id="play_again" class="btn btn-success btn-lg">Play Championship Again</button>
-        </div>
     </div>
 
-    <div class="col-md-3 predictions d-none">
-        <h3><span class="week_number">0</span><span class="week_suffix"></span> Week Predictions</h3>
-        <table id="predictions" class="table table-striped table-bordered table-hover w-100">
-            <thead class="thead-dark">
-            <tr>
-                <th>Team</th>
-                <th>%</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
-
-<div class="championship row mt-5 text-center d-none w-100 mx-1">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <h3 class="match-result-caption"><span class="week_number">0</span><span class="week_suffix"></span>
             Week Matches Results</h3>
         <div class="bg-dark text-white font-weight-bold text-center py-2 first-week d-none">1st Week Matches Results
@@ -128,6 +118,19 @@
                 <th></th>
                 <th></th>
                 <th>Guest</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="col-md-2 predictions d-none">
+        <h3><span class="week_number">0</span><span class="week_suffix"></span> Week</h3>
+        <table id="predictions" class="table table-striped table-bordered table-hover w-100">
+            <thead class="thead-dark">
+            <tr>
+                <th>Team</th>
+                <th>%</th>
             </tr>
             </thead>
             <tbody></tbody>
@@ -187,6 +190,7 @@
             })
         }
         let predictionsTable = $('#predictions').DataTable({
+            scrollY: 650,
             columnDefs: [
                 {targets: 0, className: 'dt-head-left, dt-body-left'},
                 {targets: -1, className: 'dt-head-right, dt-body-right'},
@@ -205,11 +209,12 @@
             ]
         });
         let teamsTable = $('#teams').DataTable({
+            scrollY: 450,
             columnDefs: [
                 {targets: 1, className: 'dt-body-left'},
             ],
             ajax: {
-                url: '/team-list',
+                url: '/teams-list/' + $('#team_count').html(),
                 dataSrc: 'data'
             },
             columns: [
@@ -219,10 +224,11 @@
                         return '<img src="/img/' + team.team_id + '.png">' + ' ' + team.name;
                     }
                 },
-                {data: 'percent'}
+                {data: 'team_id'}
             ]
         });
         let leagueTable = $('#league').DataTable({
+            scrollY: 650,
             columnDefs: [
                 {targets: 1, className: 'dt-body-left'}
             ],
@@ -267,6 +273,7 @@
             ]
         });
         let matchesTable = $('#matches').DataTable({
+            scrollY: 600,
             columnDefs: [
                 {targets: 0, className: 'dt-body-left'},
                 {targets: -1, className: 'dt-body-right'},
@@ -340,8 +347,11 @@
             ]
         });
 
+        $('.dataTables_wrapper.no-footer .dataTables_scrollBody').css('border-bottom', 'none');
+
         $('#range').change(function () {
             $('#team_count').html($(this).val());
+            teamsTable.ajax.url('/teams-list/' + $(this).val()).load();
         });
 
         $('#start_championship').click(function () {
@@ -380,10 +390,10 @@
             $('.finished').removeClass('d-none');
             $('#next_week').prop('disabled', true);
             $('.match-result-caption').html('All Matches Results');
-            $('#matches thead').addClass('d-none');
             $('.first-week').removeClass('d-none');
             $('#all_matches').removeClass('d-none');
             $('.play_again').removeClass('d-none').addClass('d-inline-block');
+
 
             matchesTable.ajax.url('/match-results/').load();
         });

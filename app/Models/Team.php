@@ -41,4 +41,9 @@ class Team extends Model
         $team = static::query()->where('name', $name)->first();
         return $team->id ?? null;
     }
+
+    public static function getTeamList(int $amount)
+    {
+        return static::query()->take($amount)->get();
+    }
 }
