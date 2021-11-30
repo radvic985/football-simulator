@@ -39,9 +39,11 @@ class TeamSeeder extends Seeder
      */
     public function run()
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table($this->tableName)->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        //added it to truncate table in the PostgresSQL
+        DB::statement("TRUNCATE TABLE {$this->tableName} RESTART IDENTITY CASCADE");
+//        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+//        DB::table($this->tableName)->truncate();
+//        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         DB::table($this->tableName)->insert($this->prepareData());
     }
