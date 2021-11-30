@@ -26,8 +26,11 @@ trait ChampionQueryHelperTrait
 
     public static function truncateTable()
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table(static::TABLE)->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        //added it to truncate table in the PostgresSQL(using on heroku hosting)
+        DB::statement("TRUNCATE TABLE " . static::TABLE);
+//        DB::statement("TRUNCATE TABLE " . static::TABLE . " RESTART IDENTITY CASCADE");
+//        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+//        DB::table(static::TABLE)->truncate();
+//        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }
