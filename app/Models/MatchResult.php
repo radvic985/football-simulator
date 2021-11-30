@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Traits\MatchResultQueryHelperTrait;
+use App\Models\Traits\MatchResultRelationTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * @property int $id
@@ -16,14 +14,14 @@ use Illuminate\Support\Facades\Log;
  * @property int $home_goals
  * @property int $guest_goals
  *
- * @see MatchResult::homeTeam()
- * @property Team|null $homeTeam
- *
- * @see MatchResult::guestTeam()
- * @property Team|null $guestTeam
+ * @mixin MatchResultQueryHelperTrait
+ * @mixin MatchResultRelationTrait
  */
 class MatchResult extends Model
 {
+    use MatchResultQueryHelperTrait;
+    use MatchResultRelationTrait;
+
     const TABLE = 'match_results';
 
     /**
@@ -53,61 +51,4 @@ class MatchResult extends Model
         'home_goals',
         'guest_goals',
     ];
-
-    public function homeTeam(): BelongsTo
-    {
-        return $this->belongsTo(Team::class, 'home_team_id', 'id');
-    }
-
-    public function guestTeam(): BelongsTo
-    {
-        return $this->belongsTo(Team::class, 'guest_team_id', 'id');
-    }
-
-    public static function getMatchResults(?int $week)
-    {
-        return static::with(['homeTeam', 'guestTeam'])
-            ->when($week, function (Builder $query, $week) {
-                return $query->where('week', $week);
-            })
-            ->orderBy('week')
-            ->get();
-    }
-
-    public static function getMatchResultsToWeek(?int $week)
-    {
-        return static::query()
-            ->when($week, function (Builder $query, $week) {
-                return $query->where('week', '<=', $week);
-            }, function (Builder $query) {
-                return $query->orderBy('week');
-            })
-            ->get();
-    }
-
-    public static function updateMatchResult(array $where, array $data): int
-    {
-        return static::query()
-            ->where('week', $where['week'])
-            ->where('home_team_id', Team::getTeamIdByName($where['home_name']))
-            ->update($data);
-    }
-
-    public static function saveMatches(array $matches)
-    {
-        static::truncateTable();
-        static::query()->insert($matches);
-    }
-
-    public static function getMaxWeek()
-    {
-       return static::query()->max('week');
-    }
-
-    private static function truncateTable()
-    {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table(static::TABLE)->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-    }
 }

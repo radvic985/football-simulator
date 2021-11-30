@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Traits\TeamQueryHelperTrait;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
  * @property string $name
+ *
+ * @mixin TeamQueryHelperTrait
  */
 class Team extends Model
 {
+    use TeamQueryHelperTrait;
+
     const TABLE = 'teams';
 
     /**
@@ -34,16 +39,4 @@ class Team extends Model
     protected $fillable = [
         'name',
     ];
-
-    public static function getTeamIdByName(string $name): ?int
-    {
-        /** @var Team $team */
-        $team = static::query()->where('name', $name)->first();
-        return $team->id ?? null;
-    }
-
-    public static function getTeamList(int $amount)
-    {
-        return static::query()->take($amount)->get();
-    }
 }

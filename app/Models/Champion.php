@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Traits\ChampionQueryHelperTrait;
+use App\Models\Traits\ChampionRelationTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -22,11 +22,13 @@ use Illuminate\Support\Facades\DB;
  *
  * @property int|float $percent only read without saving to db
  *
- * @see Champion::team()
- * @property Team|null $team
+ * @mixin ChampionQueryHelperTrait
  */
 class Champion extends Model
 {
+    use ChampionQueryHelperTrait;
+    use ChampionRelationTrait;
+
     const TABLE = 'champions';
 
     /**
@@ -62,34 +64,4 @@ class Champion extends Model
         'prev_pos',
         'pos',
     ];
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(Team::class, 'team_id', 'id');
-    }
-
-    public static function getChampions()
-    {
-        return static::with('team')->orderBy('pos')->get();
-    }
-
-    public static function updateLeagueTable(array $teamId, array $data)
-    {
-        static::query()->updateOrCreate($teamId, $data);
-    }
-
-    public static function getSortedLeagueTable()
-    {
-        return static::query()
-            ->orderByDesc('points')
-            ->orderByDesc('gd')
-            ->get();
-    }
-
-    public static function truncateTable()
-    {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table(static::TABLE)->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-    }
 }

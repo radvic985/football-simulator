@@ -179,22 +179,26 @@
 
             cell.addEventListener('blur', function (e) {
                 if (original !== e.target.textContent) {
-                    const row = matchesTable.row(e.target.parentElement);
-                    let params = {
-                        home_name: row.data().home_name,
-                        week: row.data().week,
-                        home_goals: e.path[0]._DT_CellIndex.column === 1 ? e.target.textContent : row.data().home_goals,
-                        guest_goals: e.path[0]._DT_CellIndex.column === 3 ? e.target.textContent : row.data().guest_goals
-                    }
-                    $.get('/match-update', params, function (message, status) {
-                        if (message === 'ok' && status === 'success') {
-                            let week = row.data().week;
-                            if (playAll) {
-                                week = '';
-                            }
-                            matchesTable.ajax.url('/match-results/' + week).load();
+                    if (Number.isInteger(Number(e.target.textContent))) {
+                        const row = matchesTable.row(e.target.parentElement);
+                        let params = {
+                            home_name: row.data().home_name,
+                            week: row.data().week,
+                            home_goals: e.path[0]._DT_CellIndex.column === 1 ? e.target.textContent : row.data().home_goals,
+                            guest_goals: e.path[0]._DT_CellIndex.column === 3 ? e.target.textContent : row.data().guest_goals
                         }
-                    });
+                        $.post('/match-update', params, function (message, status) {
+                            if (message === 'ok' && status === 'success') {
+                                let week = row.data().week;
+                                if (playAll) {
+                                    week = '';
+                                }
+                                matchesTable.ajax.url('/match-results/' + week).load();
+                            }
+                        });
+                    } else {
+                        alert('The goal value should be an integer')
+                    }
                 }
             })
         }

@@ -27,4 +27,4 @@ Route::get('/championship', ChampionshipController::class);
 Route::get('/prediction', PredictionController::class);
 Route::get('/teams-list/{team_count}', TeamListController::class);
 Route::get('/match-results/{week?}', [MatchResultController::class, 'getMatches']);
-Route::get('/match-update', [MatchResultController::class, 'updateMatch']);
+Route::post('/match-update', [MatchResultController::class, 'updateMatch']);
