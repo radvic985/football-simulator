@@ -160,7 +160,7 @@ class PredictionService implements PredictionInterface
             }
         } else {
             $secondMax = $percents->filter(fn($item) => $item !== $percentMax)->max();
-            $coefficient = abs(0.74 - ($secondMax / $percentMax - 0.74));
+            $coefficient = abs(0.7 - ($secondMax / $percentMax - 0.7));
 
             $percents->transform(function ($item) use ($percentMax, $coefficient) {
                 if ($item !== $percentMax) {
