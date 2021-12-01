@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\URL;
 */
 // added it to fix error on the free hosting server
 if (App::environment('production')) {
-    URL::forceScheme('http');
+    URL::forceScheme('https');
 }
 
 Route::get('/', function () {
