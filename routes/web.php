@@ -5,7 +5,9 @@ use App\Http\Controllers\GenerateMatchesController;
 use App\Http\Controllers\MatchResultController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\TeamListController;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// added it to fix error on the free hosting server
+if (App::environment('production')) {
+    URL::forceScheme('http');
+}
 
 Route::get('/', function () {
     return view('start');
